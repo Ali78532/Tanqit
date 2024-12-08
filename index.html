@@ -56,7 +56,7 @@
             text-align: right;
             margin-top: 10px;
             font-size: 1em;
-            color: #ff0000;
+            color: #000;
         }
         .word {
             display: inline-block;
@@ -160,6 +160,14 @@
 
                 const sentenceElement = document.createElement("div");
                 sentenceElement.className = "sentence";
+
+                // إضافة الرقم قبل الجملة
+                const sentenceNumber = document.createElement("span");
+                sentenceNumber.textContent = `${i + 1}. `;
+                sentenceNumber.style.fontWeight = "bold"; // لجعل الرقم بارزاً
+                sentenceElement.appendChild(sentenceNumber);
+
+                // تقسيم الكلمات وعرضها
                 const words = sentence.text.split(" ");
                 words.forEach(word => {
                     const span = document.createElement("span");
@@ -227,6 +235,9 @@
 
             document.getElementById("final-result").innerHTML = `درجتك ${score}<br>لكل كلمة نقطة`;
             document.getElementById("checkButton").disabled = true;
+
+            // تمرير الصفحة لعرض الدرجة
+            document.getElementById("final-result").scrollIntoView({ behavior: "smooth" });
         }
 
         loadQuestions();
