@@ -159,6 +159,30 @@
       font-size: 1em;
       color: #333;
     }
+	#spinner {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 50px;
+	height: 50px;
+	border: 6px solid rgba(255,255,255,0.3);
+	border-top-color: #fff;
+	border-radius: 50%;
+	animation: spin 1s linear infinite;
+	z-index: 10;
+	background-color: #000;
+	}
+
+@keyframes spin {
+	from {
+		transform: translate(-50%, -50%) rotate(0deg);
+	}
+	to {
+		transform: translate(-50%, -50%) rotate(360deg);
+		}
+	}
+
   </style>
 </head>
 <body>
@@ -167,12 +191,15 @@
     <div class="video-screen active" id="video-screen">
            <div class="video-text">شوف الفيديو علمود تعرف شلون تمتحن 👇</div>
       <div class="video-container">
-        <iframe src="https://www.youtube.com/embed/fGQGPE72Pr0?si=rT6zpBDsLjGCkYwS"
+      <div id="spinner"></div>
+	  <iframe
+      id="quiz-video"
+	  src="https://www.youtube.com/embed/fGQGPE72Pr0?si=rT6zpBDsLjGCkYwS"
                 title="شرح طريقة التمتحن"
                 allowfullscreen></iframe>
       </div>
        <button class="start-btn" id="start-btn">أبدأ الاختبار</button>
-    </div>
+	</div>
     <div class="quiz-screen" id="quiz-screen">
       <div id="questions-container"></div>
       <button class="check-btn" id="checkButton" onclick="checkResults()">تحقق</button>
@@ -264,6 +291,14 @@
       document.getElementById("show-btn").style.display = "none";
       document.getElementById("hide-btn").style.display = "inline-block";
     });
+	const spinner = document.getElementById('spinner');
+	const iframe  = document.getElementById('quiz-video');
+
+	// عندما ينتهي تحميل الـ iframe
+	iframe.addEventListener('load', () => {
+	spinner.style.display = 'none';
+	});
+
   </script>
   </body>
 </html>
