@@ -166,7 +166,8 @@
       const t = el.textContent;
       el.textContent = t.charAt(0) === t.charAt(0).toUpperCase()
         ? t.charAt(0).toLowerCase() + t.slice(1)
-        : t.charAt(0).toUpperCase() + t.slice(1);
+        : t.charAt(0).toUpperCase() + t.slice(1)
+        if (navigator.vibrate) navigator.vibrate(30);
     }
 
     const spinner = document.getElementById('spinner');
