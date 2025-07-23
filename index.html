@@ -1,7 +1,8 @@
-<!DOCTYPE html><html lang="ar">
+<!DOCTYPE html>
+<html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>التنقيط</title>
   <style>
     body {
@@ -14,8 +15,7 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      background: linear-gradient(135deg, #6DD5FA, #FFFFFF);
-      background-attachment: fixed;
+      background: linear-gradient(135deg, #6DD5FA, #FFFFFF) fixed;
     }
     .header {
       color: #111;
@@ -23,283 +23,203 @@
       font-weight: bold;
       margin: 20px 0;
     }
-    /* جعل الحاوية الشاملة شفافة */
-    .container {
-      max-width: 90%;
-      margin: 0 auto;
+    .container { max-width: 90%; margin: 0 auto; }
+    .video-screen { display: none; }
+    .video-screen.active { display: flex; flex-direction: column; align-items: center; }
+    .video-text {
+      font-size: 1.5em;
+      margin-bottom: 30px;
+      color: #333;
     }
-    /* إضافة خلفية بيضاء و ظل فقط لشاشة الأسئلة */
-    .quiz-screen {
-      display: none;
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-      margin-bottom: 20px;
-    }
-    .quiz-screen.active {
-      display: block;
-    }
-    .video-screen {
-      display: none;
-    }
-    .video-screen.active {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    /* قسم الفيديو */
     .video-container {
+      position: relative;
       width: 100%;
       max-width: 360px;
-      aspect-ratio: 3 / 4;
-      margin: 0px auto 30px;
+      aspect-ratio: 3/4;
+      margin: 0 auto 30px;
     }
-    .video-container iframe {
+    iframe {
       width: 100%;
       height: 100%;
       border: 1px solid #000;
       border-radius: 10px;
     }
-    .video-text {
-      font-size: 1.5em;
-      margin-bottom: 20px;
-      color: #333;
+    #spinner {
+      position: absolute;
+      top:50%; left:50%; transform:translate(-50%,-50%);
+      width:50px; height:50px;
+      border:6px solid rgba(255,255,255,0.3);
+      border-top-color:#fff;
+      border-radius:50%;
+      animation:spin 1s linear infinite;
+      z-index:10;
+      background:#000;
     }
-    .start-btn {
-      padding: 12px 24px;
-      font-size: 1em;
-      border: none;
-      border-radius: 10px;
-      background: #006400;
-      color: white;
-      cursor: pointer;
-      transition: background 0.3s ease-in-out;
+    @keyframes spin {
+      from{transform:translate(-50%,-50%) rotate(0deg);} 
+      to{transform:translate(-50%,-50%) rotate(360deg);} 
     }
-    .start-btn:hover {
-      background: #004d00;
-    }
-    .question-box {
-      background: #eeeeee;
-      border: 2px solid #007ACC;
-      border-radius: 10px;
+    .quiz-screen {
+      display: none;
+      background: #fff;
       padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
       margin-bottom: 20px;
+    }
+    .quiz-screen.active { display: block; }
+    .question-box {
+      background:#eee;
+      border:2px solid #007ACC;
+      border-radius:10px;
+      padding:20px;
+      margin-bottom:20px;
+      text-align:left;
     }
     .sentence {
-      font-size: 1em;
-      margin: 10px 0;
-      line-height: 2em;
-      text-align: left;
-      direction: ltr;
+      font-size:1em;
+      margin:10px 0;
+      line-height:2em;
+      direction:ltr;
     }
     .feedback {
-      text-align: right;
-      margin-top: 10px;
-      font-size: 1em;
-      color: red;
+      text-align:right;
+      margin-top:10px;
+      font-size:1em;
+      color:red;
     }
     .word {
-      display: inline-block;
-      margin: 0 5px;
-      padding: 5px;
-      font-size: 1.2em;
-      cursor: pointer;
-      border-radius: 5px;
-      transition: transform 0.2s ease-in-out, background-color 0.2s;
+      display:inline-block;
+      margin:0 5px;
+      padding:5px;
+      font-size:1.2em;
+      cursor:pointer;
+      border-radius:5px;
+      transition:transform .2s, background-color .2s;
     }
-    .word:hover {
-      transform: scale(1.1);
-      background-color: #f1f1f1;
+    .word:hover { transform:scale(1.1); background:#f1f1f1; }
+    .correct { color:green; font-weight:bold; }
+    .incorrect { color:red; font-weight:bold; }
+    #final-result {
+      margin-top:20px;
+      font-size:2em;
+      font-weight:bold;
+      color:black;
+      display:none;
     }
-    .correct {
-      color: green;
-      font-weight: bold;
-    }
-    .incorrect {
-      color: red;
-      font-weight: bold;
-    }
-    .result {
-      margin-top: 20px;
-      font-size: 2em;
-      font-weight: bold;
-    }
-    button.check-btn {
-      margin-top: 20px;
-      padding: 15px 25px;
-      font-size: 1em;
-      border: none;
-      border-radius: 10px;
-      background: #007ACC;
-      color: white;
-      cursor: pointer;
-      transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
-    }
-    button.check-btn:hover {
-      background: #005A99;
-      transform: scale(1.05);
-    }
-    #toggle-container {
-      margin-top: 20px;
-      display: none;
-    }
-    #hide-btn, #show-btn {
-      background: transparent;
-      border: 2px solid #000;
-      color: #000;
-      margin: 5px;
-      padding: 10px 20px;
-      font-size: 1em;
-      border-radius: 10px;
-    }
-    #show-btn { display: none; }
-    footer {
-      margin: 20px 0;
-      font-size: 1em;
-      color: #333;
-    }
-	.video-container { position: relative; }
-	#spinner {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	width: 50px;
-	height: 50px;
-	border: 6px solid rgba(255,255,255,0.3);
-	border-top-color: #fff;
-	border-radius: 50%;
-	animation: spin 1s linear infinite;
-	z-index: 10;
-	background-color: #000;
-	}
-
-@keyframes spin {
-	from {
-		transform: translate(-50%, -50%) rotate(0deg);
-	}
-	to {
-		transform: translate(-50%, -50%) rotate(360deg);
-		}
-	}
-
+    button { cursor:pointer; border-radius:10px; border:none; padding:12px 24px; font-size:1em; }
+    .start-btn { background:#006400; color:#fff; transition:background .3s; }
+    .start-btn:hover { background:#004d00; }
+    .check-btn { background:#007ACC; color:#fff; margin-top:20px; transition:background .3s, transform .2s; }
+    .check-btn:hover { background:#005A99; transform:scale(1.05); }
+    #show-score-btn, #show-sol-btn { background:transparent; border:2px solid #000; color:#000; margin:10px; padding:10px 20px; display:none; }
+    footer { margin:20px 0; font-size:1em; color:#333; }
   </style>
 </head>
 <body>
   <div class="header">التنقيط</div>
   <div class="container">
     <div class="video-screen active" id="video-screen">
-           <div class="video-text">شوف الفيديو علمود تعرف شلون تمتحن 👇</div>
+      <div class="video-text">شوف الفيديو علمود تعرف شلون تمتحن 👇</div>
       <div class="video-container">
-      <div id="spinner"></div>
-	  <iframe
-      id="quiz-video"
-	  src="https://www.youtube.com/embed/fGQGPE72Pr0?si=rT6zpBDsLjGCkYwS"
-                title="شرح طريقة التمتحن"
-                allowfullscreen></iframe>
+        <div id="spinner"></div>
+        <iframe id="quiz-video" src="https://www.youtube.com/embed/fGQGPE72Pr0?si=rT6zpBDsLjGCkYwS" allowfullscreen></iframe>
       </div>
-       <button class="start-btn" id="start-btn">أبدأ الاختبار</button>
-	</div>
+      <button class="start-btn" id="start-btn">أبدأ الاختبار</button>
+    </div>
     <div class="quiz-screen" id="quiz-screen">
       <div id="questions-container"></div>
-      <button class="check-btn" id="checkButton" onclick="checkResults()">تحقق</button>
-      <div class="result" id="final-result"></div>
-      <div id="toggle-container">
-        <button id="hide-btn">إخفاء الحل</button>
-        <button id="show-btn">عرض الحل</button>
-      </div>
+      <button class="check-btn" id="check-btn">تحقق</button>
+      <button id="show-score-btn">عرض الدرجة</button>
+      <div id="final-result"></div>
+      <button id="show-sol-btn">عرض الحل</button>
     </div>
   </div>
-  <footer>إعداد الأستاذ: علي حسين</footer>   <script>
+  <footer>إعداد الأستاذ: علي حسين</footer>
+  <script>
     const sentences = [
       { text: "was ali in basra last may?", correct: "Was Ali in Basra last May?", feedback: { "was": "* كلمة was لازم تبدي بحرف كبير لانها في بداية الجملة", "ali": "* كلمة ali لازم تبدي بحرف كبير لانه اسم شخصية", "basra": "* كلمة basra لازم تبدي بحرف كبير لانها اسم محافظة", "may?": "* كلمة may لازم تبدي بحرف كبير لانه اسم شهر" } },
       { text: "on thursday, i relax.", correct: "On Thursday, I relax.", feedback: { "on": "* كلمة on لازم تبدي بحرف كبير لانها في بداية الجملة", "thursday,": "* كلمة thursday لازم تبدي بحرف كبير لانها من ايام الاسبوع", "i": "* الضمير i يكتب كبير اينما وجد" } }
     ];
+    let finalScore = 0;
 
     function loadQuestions() {
       const container = document.getElementById("questions-container");
       container.innerHTML = "";
-      sentences.forEach((sentence, i) => {
+      sentences.forEach((s, i) => {
         const box = document.createElement("div"); box.className = "question-box";
         const sentEl = document.createElement("div"); sentEl.className = "sentence";
-        const num = document.createElement("span"); num.textContent = `${i+1}. `; num.style.fontWeight = "bold";
-        sentEl.appendChild(num);
-        sentence.text.split(" ").forEach(word => {
-          const span = document.createElement("span"); span.textContent = word; span.className = "word";
-          span.onclick = () => toggleCapitalization(span);
-          sentEl.appendChild(span);
+        s.text.split(" ").forEach(w => {
+          const sp = document.createElement("span");
+          sp.textContent = w;
+          sp.className = "word";
+          sp.onclick = () => toggleCapitalization(sp);
+          sentEl.appendChild(sp);
         });
-        const fbCont = document.createElement("div"); fbCont.id = `feedback-${i}`; fbCont.className = "feedback";
-        box.append(sentEl, fbCont);
+        const fb = document.createElement("div"); fb.id = `fb-${i}`; fb.className = "feedback";
+        box.append(sentEl, fb);
         container.appendChild(box);
       });
     }
 
     function toggleCapitalization(el) {
-      const text = el.textContent;
-      el.textContent = text.charAt(0) === text.charAt(0).toUpperCase()
-        ? text.charAt(0).toLowerCase() + text.slice(1)
-        : text.charAt(0).toUpperCase() + text.slice(1);
-      if (navigator.vibrate) navigator.vibrate(30);
+      const t = el.textContent;
+      el.textContent = t.charAt(0) === t.charAt(0).toUpperCase()
+        ? t.charAt(0).toLowerCase() + t.slice(1)
+        : t.charAt(0).toUpperCase() + t.slice(1);
     }
 
-    function checkResults() {
+    const spinner = document.getElementById('spinner');
+    const iframe = document.getElementById('quiz-video');
+    iframe.addEventListener('load', () => { spinner.style.display = 'none'; });
+
+    document.getElementById('start-btn').onclick = () => {
+      iframe.src = iframe.src; // reset
+      document.getElementById('video-screen').classList.remove('active');
+      document.getElementById('quiz-screen').classList.add('active');
+      loadQuestions();
+    };
+
+    document.getElementById('check-btn').onclick = () => {
       let score = 0;
-      document.querySelectorAll(".feedback").forEach(f => f.innerHTML = "");
-      document.querySelectorAll(".word").forEach(w => w.classList.remove("correct","incorrect"));
-      const boxes = document.querySelectorAll(".question-box");
-      sentences.forEach((s, idx) => {
-        const words = boxes[idx].querySelectorAll(".word");
-        const correctWords = s.correct.split(" ");
-        words.forEach((w, i) => {
-          if(w.textContent === correctWords[i]) { score++; w.classList.add("correct"); }
-          else {
-            w.classList.add("incorrect");
-            const fb = s.feedback[correctWords[i].toLowerCase()];
-            if(fb) {
-              const d = document.createElement("div"); d.textContent = fb;
-              document.getElementById(`feedback-${idx}`).append(d);
+      sentences.forEach((s, i) => {
+        const words = document.querySelectorAll('#questions-container .question-box')[i].querySelectorAll('.word');
+        const correctWords = s.correct.split(' ');
+        document.getElementById(`fb-${i}`).innerHTML = '';
+        words.forEach((w, j) => {
+          w.classList.remove('correct','incorrect');
+          if (w.textContent === correctWords[j]) {
+            score++; w.classList.add('correct');
+          } else {
+            w.classList.add('incorrect');
+            const msg = s.feedback[correctWords[j].toLowerCase()];
+            if (msg) {
+              const d = document.createElement('div');
+              d.textContent = msg;
+              document.getElementById(`fb-${i}`).appendChild(d);
             }
           }
         });
       });
-      document.getElementById("final-result").innerHTML = `درجتك ${score}`;
-      document.getElementById("checkButton").style.display = "none";
-      document.getElementById("toggle-container").style.display = "block";
-      document.getElementById("final-result").scrollIntoView({behavior:"smooth"});
-    }
+      finalScore = score;
+      document.getElementById('check-btn').style.display = 'none';
+      document.getElementById('show-score-btn').style.display = 'inline-block';
+    };
 
-    document.getElementById('start-btn').addEventListener('click', () => {
-      // إيقاف وتحميل الفيديو مجدداً لإيقاف التشغيل
-      const iframe = document.querySelector('#video-screen iframe');
-      iframe.src = iframe.src;
-      // تبديل العرض
-      document.getElementById('video-screen').classList.remove('active');
-      document.getElementById('quiz-screen').classList.add('active');
-      loadQuestions();
-    });
+    document.getElementById('show-score-btn').onclick = () => {
+      document.getElementById('questions-container').style.display = 'none';
+      document.getElementById('show-score-btn').style.display = 'none';
+      document.getElementById('final-result').textContent = `درجتك ${finalScore}`;
+      document.getElementById('final-result').style.display = 'block';
+      document.getElementById('show-sol-btn').style.display = 'inline-block';
+    };
 
-    // إعداد أزرار إخفاء/عرض الحل
-    document.getElementById("toggle-container").style.display = "none";
-    document.getElementById("hide-btn").addEventListener("click", () => {
-      document.getElementById("questions-container").style.display = "none";
-      document.getElementById("hide-btn").style.display = "none";
-      document.getElementById("show-btn").style.display = "inline-block";
-    });
-    document.getElementById("show-btn").addEventListener("click", () => {
-      document.getElementById("questions-container").style.display = "";
-      document.getElementById("show-btn").style.display = "none";
-      document.getElementById("hide-btn").style.display = "inline-block";
-    });
-	const spinner = document.getElementById('spinner');
-	const iframe  = document.getElementById('quiz-video');
-
-	// عندما ينتهي تحميل الـ iframe
-	iframe.addEventListener('load', () => {
-	spinner.style.display = 'none';
-	});
-
+    document.getElementById('show-sol-btn').onclick = () => {
+      document.getElementById('questions-container').style.display = '';
+      document.getElementById('final-result').style.display = 'none';
+      document.getElementById('show-sol-btn').style.display = 'none';
+      document.getElementById('show-score-btn').style.display = 'inline-block';
+    };
   </script>
-  </body>
+</body>
 </html>
